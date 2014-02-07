@@ -48,7 +48,7 @@
       else
         editableOffset();
     });
-    $input.caret('pos', 53).focus();
+    // $input.caret('pos', 53).focus();
 
     // CKEDITOR.config.toolbar = [[ 'Source', '-', 'Bold', 'Italic' ]];
     // CKEDITOR.replace( 'ckEditor', {
@@ -65,9 +65,12 @@
     ifrBody.contentEditable = true;
     ifrBody.id = 'ifrBody';
     ifrBody.innerHTML = 'For <strong>WYSIWYG</strong> such as <strong>ckeditor</strong>'
-    $(ifrBody).on('keyup mouseup', function() {
+    $(ifrBody).on('focus keyup mouseup', function() {
       resizeBox($(ifrBody).caret('offset'));
     });
+
+    // $(ifrBody).caret('pos', 7).focus();
+    $editable.caret('pos', 35).focus();
 
 
   });

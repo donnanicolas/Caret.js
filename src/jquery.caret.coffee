@@ -33,8 +33,29 @@
     constructor: (@$inputor) ->
       @domInputor = @$inputor[0]
 
-    # NOTE: Duck type
-    setPos: (pos) -> @domInputor
+    setPos: (pos) ->
+      _pos = pos
+      if oWindow.getSelection
+        range = oDocument.createRange()
+        for node in @domInputor.childNodes
+          range.selectNode(node)
+          range_content = range.toString()
+          if _pos > range_content.length
+            _pos -= range_content.length
+            continue
+          if node.childNodes.length > 0
+            _node = $(":contains('"+range_content+"')", node)[0]
+            range.setStart(_node?.lastChild || node.lastChild, _pos)
+          else
+            range.setStart(node, _pos)
+          range.collapse(true)
+          sel = oWindow.getSelection()
+          sel.removeAllRanges()
+          sel.addRange(range)
+          break
+
+      @domInputor
+
     getIEPosition: -> $.noop()
     getPosition: -> $.noop()
 
@@ -49,7 +70,7 @@
       if range = this.range() # Major Browser and IE > 10
         clonedRange = range.cloneRange()
         clonedRange.selectNodeContents(@domInputor)
-        clonedRange.setEnd(range.endContainer, range.endOffset)
+        # clonedRange.setEnd(range.endContainer, range.endOffset)
         pos = clonedRange.toString().length
         clonedRange.detach()
         pos

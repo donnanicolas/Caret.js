@@ -33,6 +33,32 @@
       }
 
       EditableCaret.prototype.setPos = function(pos) {
+        var node, range, range_content, sel, _i, _len, _node, _pos, _ref;
+        _pos = pos;
+        if (oWindow.getSelection) {
+          range = oDocument.createRange();
+          _ref = this.domInputor.childNodes;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            node = _ref[_i];
+            range.selectNode(node);
+            range_content = range.toString();
+            if (_pos > range_content.length) {
+              _pos -= range_content.length;
+              continue;
+            }
+            if (node.childNodes.length > 0) {
+              _node = $(":contains('" + range_content + "')", node)[0];
+              range.setStart((_node != null ? _node.lastChild : void 0) || node.lastChild, _pos);
+            } else {
+              range.setStart(node, _pos);
+            }
+            range.collapse(true);
+            sel = oWindow.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            break;
+          }
+        }
         return this.domInputor;
       };
 
@@ -58,7 +84,6 @@
         if (range = this.range()) {
           clonedRange = range.cloneRange();
           clonedRange.selectNodeContents(this.domInputor);
-          clonedRange.setEnd(range.endContainer, range.endOffset);
           pos = clonedRange.toString().length;
           clonedRange.detach();
           return pos;
